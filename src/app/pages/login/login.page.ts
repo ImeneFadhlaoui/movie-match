@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonButton, IonContent, IonHeader, IonRouterLink, IonTitle, IonToolbar } from '@ionic/angular';
 import { RouterLink } from '@angular/router';
+import { FirebaseService } from '../../services/firebase';
 
 @Component({
   selector: 'app-login',
@@ -12,9 +13,10 @@ import { RouterLink } from '@angular/router';
 })
 export class LoginPage implements OnInit {
 
-  constructor() { }
+  private firebase = inject(FirebaseService);
 
   ngOnInit() {
+  
   }
 
 }
