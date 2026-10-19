@@ -1,13 +1,27 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>playlist</ion-title>
+    <ion-title>Ma playlist</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">playlist</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-list>
+    @for (film of films(); track film.id) {
+      <ion-item>
+        <ion-thumbnail slot="start">
+          @if (film.posterUrl) {
+            <img [src]="film.posterUrl" [alt]="film.title" />
+          }
+        </ion-thumbnail>
+        <ion-label [routerLink]="['/tabs/films', film.id]">
+          <h2>{{ film.title }}</h2>
+        </ion-label>
+        <ion-button slot="end" fill="clear" color="danger" (click)="remove(film.id)">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-button>
+      </ion-item>
+    } @empty {
+      <p class="ion-padding">Ta playlist est vide. Ajoute des films depuis l'onglet Films.</p>
+    }
+  </ion-list>
 </ion-content>

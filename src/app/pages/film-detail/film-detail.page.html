@@ -1,13 +1,24 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>film-detail</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/films"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ film()?.title ?? 'Chargement...' }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">film-detail</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  @if (film(); as film) {
+    @if (film.posterUrl) {
+      <img [src]="film.posterUrl" [alt]="film.title" />
+    }
+    <h1>{{ film.title }}</h1>
+    <p>Sortie : {{ film.releaseDate }}</p>
+    <p>{{ film.overview }}</p>
+
+    <ion-button expand="block" (click)="toggleFavorite()">
+      <ion-icon slot="start" [name]="isFavorite() ? 'heart' : 'heart-outline'"></ion-icon>
+      {{ isFavorite() ? 'Retirer de ma playlist' : 'Ajouter à ma playlist' }}
+    </ion-button>
+  }
 </ion-content>
