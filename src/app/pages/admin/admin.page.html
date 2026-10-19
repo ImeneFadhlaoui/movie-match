@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/profil"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Administration</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Ajouter un film -->
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Ajouter un film</ion-label>
+    </ion-list-header>
+    <ion-item>
+      <ion-input label="Titre" labelPlacement="floating" [(ngModel)]="title"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-textarea label="Résumé" labelPlacement="floating" [(ngModel)]="overview"></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-input label="URL de l'affiche" labelPlacement="floating" type="url" [(ngModel)]="posterUrl"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-input label="Date de sortie" labelPlacement="stacked" type="date" [(ngModel)]="releaseDate"></ion-input>
+    </ion-item>
+  </ion-list>
+  <ion-button expand="block" (click)="onAddFilm()">Ajouter le film</ion-button>
+
+  <!-- Gérer les utilisateurs -->
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Utilisateurs</ion-label>
+    </ion-list-header>
+    @for (user of users(); track user.uid) {
+      <ion-item>
+        <ion-toggle
+          [checked]="user.isDisabled"
+          (ionChange)="onToggleDisabled(user, $event.detail.checked)"
+        >
+          {{ user.prenom }} {{ user.nom }} ({{ user.email }}) — désactivé
+        </ion-toggle>
+      </ion-item>
+    } @empty {
+      <ion-item>
+        <ion-label>Aucun autre utilisateur.</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+</ion-content>

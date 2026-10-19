@@ -90,4 +90,12 @@ export class AuthService {
 
     return profileSnap.data() as UserProfile;
   }
+  
+  async getCurrentProfile(): Promise<UserProfile | null> {
+  const user = this.firebase.auth.currentUser;
+  if (!user) {
+    return null;
+  }
+  return this.getProfile(user.uid);
+}
 }

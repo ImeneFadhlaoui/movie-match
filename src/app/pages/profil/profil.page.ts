@@ -1,33 +1,30 @@
-import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import {
-  IonButton,
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  NavController,
+  IonAvatar, IonButton, IonContent, IonHeader, IonItem, IonLabel,
+  IonList, IonRouterLink, IonTitle, IonToolbar, NavController,
 } from '@ionic/angular';
 import { AuthService } from '../../services/auth';
+import { UserProfile } from '../../models/user-profile';
 
 @Component({
   selector: 'app-profil',
   templateUrl: './profil.page.html',
   styleUrls: ['./profil.page.scss'],
   imports: [
-    IonContent,
-    IonHeader,
-    IonButton,
-    IonTitle,
-    IonToolbar,
-    CommonModule,
-    FormsModule,
+    IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonAvatar,
+    IonList, IonItem, IonLabel, RouterLink, IonRouterLink,
   ],
 })
 export class ProfilPage {
   private authService = inject(AuthService);
   private navCtrl = inject(NavController);
+
+  profile = signal<UserProfile | null>(null);
+
+  async ionViewWillEnter() {
+    this.profile.set(await this.authService.getCurrentProfile());
+  }
 
   async onLogout() {
     await this.authService.logout();

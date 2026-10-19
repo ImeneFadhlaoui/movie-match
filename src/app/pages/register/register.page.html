@@ -62,7 +62,7 @@
   <ion-icon slot="start" name="camera"></ion-icon>
   Prendre une photo
 </ion-button>
-@if (photo) {
+@if (photo()) {
   <ion-avatar>
     <img [src]="photo()" alt="Photo de profil" />
   </ion-avatar>
