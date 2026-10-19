@@ -58,6 +58,16 @@
   </ion-item>
   </ion-list>
 
+  <ion-button expand="block" (click)="takePhoto()">
+  <ion-icon slot="start" name="camera"></ion-icon>
+  Prendre une photo
+</ion-button>
+@if (photo) {
+  <ion-avatar>
+    <img [src]="photo" alt="Photo de profil" />
+  </ion-avatar>
+}
+
   <ion-button expand="block" (click)="onRegister()">S'inscrire</ion-button>
   <ion-button fill="clear" [routerLink]="['/login']">
     Déjà un compte ? Se connecter
