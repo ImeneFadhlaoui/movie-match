@@ -1,13 +1,29 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>films</ion-title>
+    <ion-title>Films</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">films</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  @if (loading()) {
+    <div class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+    </div>
+  }
+
+  <ion-list>
+    @for (film of films(); track film.id) {
+      <ion-item [routerLink]="['/tabs/films', film.id]" detail>
+        <ion-thumbnail slot="start">
+          @if (film.posterUrl) {
+            <img [src]="film.posterUrl" [alt]="film.title" />
+          }
+        </ion-thumbnail>
+        <ion-label>
+          <h2>{{ film.title }}</h2>
+          <p>{{ film.releaseDate }}</p>
+        </ion-label>
+      </ion-item>
+    }
+  </ion-list>
 </ion-content>
