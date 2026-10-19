@@ -35,3 +35,62 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+/* ---------- Pages de connexion et d'inscription ---------- */
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 48px 24px 24px;
+
+  .brand {
+    text-align: center;
+    margin-bottom: 28px;
+
+    h1 {
+      margin: 0;
+      font-size: 1.7rem;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 6px 0 0;
+      color: var(--ion-color-medium);
+    }
+  }
+
+  .brand-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 16px;
+    border-radius: 20px;
+    background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast);
+    font-size: 40px;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    ion-button {
+      margin-top: 8px;
+    }
+  }
+
+  .switch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: var(--ion-color-medium);
+  }
+}

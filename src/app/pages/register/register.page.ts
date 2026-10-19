@@ -1,26 +1,14 @@
 import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {
-  IonAvatar,
-  IonButton,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonInput,
-  IonItem,
-  IonList,
-  IonRouterLink,
-  IonTitle,
-  IonToolbar,
-  NavController,
-  ToastController,
+  IonButton, IonContent, IonIcon, IonInput, IonInputPasswordToggle,
+  IonRouterLink, IonSpinner, NavController, ToastController,
 } from '@ionic/angular';
 import { Camera } from '@capacitor/camera';
 import { FirebaseError } from 'firebase/app';
 import { addIcons } from 'ionicons';
-import { camera } from 'ionicons/icons';
+import { camera, eye, eyeOff } from 'ionicons/icons';
 import { AuthService } from '../../services/auth';
 
 @Component({
@@ -28,20 +16,8 @@ import { AuthService } from '../../services/auth';
   templateUrl: './register.page.html',
   styleUrls: ['./register.page.scss'],
   imports: [
-    IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
-    IonButton,
-    IonInput,
-    IonItem,
-    IonList,
-    IonIcon,
-    IonAvatar,
-    CommonModule,
-    FormsModule,
-    RouterLink,
-    IonRouterLink,
+    FormsModule, RouterLink, IonRouterLink, IonContent, IonButton,
+    IonIcon, IonInput, IonInputPasswordToggle, IonSpinner,
   ],
 })
 export class RegisterPage {
@@ -51,13 +27,14 @@ export class RegisterPage {
   prenom: string = '';
   age: number | null = null;
   photo = signal<string | null>(null);
+  loading = signal(false);
 
   private authService = inject(AuthService);
   private navCtrl = inject(NavController);
   private toastController = inject(ToastController);
 
   constructor() {
-    addIcons({ camera });
+    addIcons({ camera, eye, eyeOff });
   }
 
   private async showError(message: string) {
@@ -120,17 +97,23 @@ export class RegisterPage {
   }
 
   async onRegister() {
+    if (this.loading()) {
+      return;
+    }
+
     const photo = this.photo();
+
+    if (photo === null) {
+      await this.showError('Veuillez prendre une photo de profil.');
+      return;
+    }
 
     if (this.age === null) {
       await this.showError('Veuillez saisir votre âge.');
       return;
     }
 
-    if (photo === null) {
-      await this.showError('Veuillez prendre une photo de profil.');
-      return;
-    }
+    this.loading.set(true);
 
     try {
       await this.authService.register(
@@ -162,6 +145,8 @@ export class RegisterPage {
       }
 
       await this.showError(message);
+    } finally {
+      this.loading.set(false);
     }
   }
 }
