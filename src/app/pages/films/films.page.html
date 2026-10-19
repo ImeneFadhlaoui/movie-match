@@ -2,28 +2,39 @@
   <ion-toolbar>
     <ion-title>Films</ion-title>
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Rechercher un film"
+      [debounce]="300"
+      (ionInput)="query.set($event.detail.value ?? '')"
+    ></ion-searchbar>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   @if (loading()) {
-    <div class="ion-text-center ion-padding">
+    <div class="loading">
       <ion-spinner></ion-spinner>
     </div>
-  }
-
-  <ion-list>
-    @for (film of films(); track film.id) {
-      <ion-item [routerLink]="['/tabs/films', film.id]" detail>
-        <ion-thumbnail slot="start">
+  } @else {
+    <div class="film-grid">
+      @for (film of filteredFilms(); track film.id) {
+        <ion-card class="film-card" [button]="true" [routerLink]="['/tabs/films', film.id]">
           @if (film.posterUrl) {
-            <img [src]="film.posterUrl" [alt]="film.title" />
+            <img [src]="film.posterUrl" [alt]="film.title" loading="lazy" />
+          } @else {
+            <div class="no-poster">
+              <ion-icon name="film-outline"></ion-icon>
+            </div>
           }
-        </ion-thumbnail>
-        <ion-label>
-          <h2>{{ film.title }}</h2>
-          <p>{{ film.releaseDate }}</p>
-        </ion-label>
-      </ion-item>
-    }
-  </ion-list>
+          <div class="film-info">
+            <h3>{{ film.title }}</h3>
+            <p>{{ film.releaseDate.slice(0, 4) }}</p>
+          </div>
+        </ion-card>
+      } @empty {
+        <p class="empty">Aucun film trouvé.</p>
+      }
+    </div>
+  }
 </ion-content>

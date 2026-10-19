@@ -1,9 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
-  IonContent, IonHeader, IonItem, IonLabel, IonList, IonRouterLink,
-  IonSpinner, IonThumbnail, IonTitle, IonToolbar, ToastController,
+  IonCard, IonContent, IonHeader, IonIcon, IonRouterLink, IonSearchbar,
+  IonSpinner, IonTitle, IonToolbar, ToastController,
 } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { filmOutline } from 'ionicons/icons';
 import { FilmService } from '../../services/film';
 import { Film } from '../../models/film';
 
@@ -12,8 +14,8 @@ import { Film } from '../../models/film';
   templateUrl: './films.page.html',
   styleUrls: ['./films.page.scss'],
   imports: [
-    IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem,
-    IonLabel, IonThumbnail, IonSpinner, RouterLink, IonRouterLink,
+    IonContent, IonHeader, IonTitle, IonToolbar, IonSearchbar, IonCard,
+    IonIcon, IonSpinner, RouterLink, IonRouterLink,
   ],
 })
 export class FilmsPage {
@@ -22,6 +24,20 @@ export class FilmsPage {
 
   films = signal<Film[]>([]);
   loading = signal(true);
+  query = signal('');
+
+  // Recalculé automatiquement quand films() ou query() change
+  filteredFilms = computed(() => {
+    const search = this.query().toLowerCase().trim();
+    if (search === '') {
+      return this.films();
+    }
+    return this.films().filter((film) => film.title.toLowerCase().includes(search));
+  });
+
+  constructor() {
+    addIcons({ filmOutline });
+  }
 
   async ionViewWillEnter() {
     this.loading.set(true);

@@ -4,32 +4,60 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true">
   @if (profile(); as profile) {
-    @if (profile.photoURL) {
-      <ion-avatar style="width: 120px; height: 120px; margin: 0 auto 16px">
-        <img [src]="profile.photoURL" alt="Photo de profil" />
+    <!-- En-tête : photo + nom -->
+    <div class="profile-header">
+      <ion-avatar class="profile-avatar">
+        @if (profile.photoURL) {
+          <img [src]="profile.photoURL" alt="Photo de profil" />
+        } @else {
+          <ion-icon name="person-circle-outline" class="avatar-placeholder"></ion-icon>
+        }
       </ion-avatar>
-    }
+      <h1>{{ profile.prenom }} {{ profile.nom }}</h1>
+      @if (profile.isAdmin) {
+        <ion-chip color="primary">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+          <ion-label>Administrateur</ion-label>
+        </ion-chip>
+      }
+    </div>
 
-    <ion-list>
+    <!-- Informations -->
+    <ion-list [inset]="true">
       <ion-item>
-        <ion-label>
-          <h2>{{ profile.prenom }} {{ profile.nom }}</h2>
-          <p>{{ profile.email }}</p>
-          <p>{{ profile.age }} ans</p>
-        </ion-label>
+        <ion-icon slot="start" name="mail-outline" color="medium"></ion-icon>
+        <ion-label>Email</ion-label>
+        <ion-note slot="end">{{ profile.email }}</ion-note>
+      </ion-item>
+      <ion-item lines="none">
+        <ion-icon slot="start" name="calendar-outline" color="medium"></ion-icon>
+        <ion-label>Âge</ion-label>
+        <ion-note slot="end">{{ profile.age }} ans</ion-note>
       </ion-item>
     </ion-list>
 
+    <!-- Administration (admin uniquement) -->
     @if (profile.isAdmin) {
-      <ion-button expand="block" [routerLink]="['/tabs/admin']">
-        Administration
-      </ion-button>
+      <ion-list [inset]="true">
+        <ion-item [button]="true" [detail]="true" lines="none" [routerLink]="['/tabs/admin']">
+          <ion-icon slot="start" name="settings-outline" color="primary"></ion-icon>
+          <ion-label>Administration</ion-label>
+        </ion-item>
+      </ion-list>
     }
-  }
 
-  <ion-button expand="block" color="danger" (click)="onLogout()">
-    Se déconnecter
-  </ion-button>
+    <!-- Déconnexion -->
+    <div class="logout">
+      <ion-button fill="clear" color="danger" (click)="onLogout()">
+        <ion-icon slot="start" name="log-out-outline"></ion-icon>
+        Se déconnecter
+      </ion-button>
+    </div>
+  } @else {
+    <div class="loading">
+      <ion-spinner></ion-spinner>
+    </div>
+  }
 </ion-content>

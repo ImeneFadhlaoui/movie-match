@@ -5,32 +5,50 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
   @if (loading()) {
-    <div class="ion-text-center ion-padding">
+    <div class="loading">
       <ion-spinner></ion-spinner>
     </div>
   } @else {
-    <ion-list>
-      @for (match of matches(); track match.profile.uid) {
-        <ion-item>
-          <ion-avatar slot="start">
+    <p class="intro">
+      Utilisateurs ayant plus de 75 % de films favoris en commun avec toi.
+    </p>
+
+    @for (match of matches(); track match.profile.uid) {
+      <ion-card class="match-card">
+        <div class="match-row">
+          <ion-avatar>
             @if (match.profile.photoURL) {
               <img [src]="match.profile.photoURL" alt="Photo" />
+            } @else {
+              <ion-icon name="person-circle-outline" class="avatar-placeholder"></ion-icon>
             }
           </ion-avatar>
-          <ion-label>
+
+          <div class="match-text">
             <h2>{{ match.profile.prenom }} {{ match.profile.nom }}</h2>
-            <p>{{ match.profile.age }} ans</p>
-          </ion-label>
-          <ion-note slot="end" color="success">
-            {{ match.score | percent }}
-          </ion-note>
-        </ion-item>
-      } @empty {
-        <p class="ion-padding">
-          Aucun utilisateur n'a plus de 75 % de films en commun avec toi pour le moment.
+            <p>
+              {{ match.profile.age }} ans ·
+              {{ match.commonCount }} film{{ match.commonCount > 1 ? 's' : '' }} en commun
+            </p>
+          </div>
+
+          <div class="match-score">{{ match.score | percent }}</div>
+        </div>
+        <ion-progress-bar [value]="match.score" color="success"></ion-progress-bar>
+      </ion-card>
+    } @empty {
+      <div class="empty">
+        <ion-icon name="people-outline"></ion-icon>
+        <p>Aucun match pour le moment.</p>
+        <p class="hint">
+          Ajoute plus de films à ta playlist pour trouver des utilisateurs qui ont les mêmes goûts.
         </p>
-      }
-    </ion-list>
+      </div>
+    }
   }
 </ion-content>
