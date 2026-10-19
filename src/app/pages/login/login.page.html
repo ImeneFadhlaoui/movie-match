@@ -11,7 +11,26 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-button [routerLink]="['/tabs/films']">Se connecter</ion-button>
+  <ion-list>
+    <ion-item>
+      <ion-input
+        label="Email"
+        labelPlacement="floating"
+        type="email"
+        [(ngModel)]="email"
+      ></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-input
+        label="Mot de passe"
+        labelPlacement="floating"
+        type="password"
+        [(ngModel)]="password"
+      ></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="block" (click)="onLogin()">Se connecter</ion-button>
   <ion-button fill="clear" [routerLink]="['/register']">
     Pas encore de compte ? S’inscrire
   </ion-button>
