@@ -16,40 +16,43 @@ export class AuthService {
   private firebase = inject(FirebaseService);
 
   async register(
-    email: string,
-    password: string,
-    nom: string,
-    prenom: string,
-    age: number,
-  ) {
-    const credential = await createUserWithEmailAndPassword(
-      this.firebase.auth,
-      email,
-      password,
-    );
-    const uid = credential.user.uid;
+  email: string,
+  password: string,
+  nom: string,
+  prenom: string,
+  age: number,
+  photo: string,
+) {
+  const credential = await createUserWithEmailAndPassword(
+    this.firebase.auth,
+    email,
+    password,
+  );
+  const uid = credential.user.uid;
 
-    const profile: UserProfile = {
-      uid: uid,
-      nom,
-      prenom,
-      age,
-      photoURL: '',
-      email,
-      isAdmin: false,
-      isDisabled: false,
-      createdAt: new Date(),
-    };
-    await setDoc(doc(this.firebase.db, 'users', uid), profile);
+  const profile: UserProfile = {
+    uid: uid,
+    nom,
+    prenom,
+    age,
+    photoURL: photo,
+    email,
+    isAdmin: false,
+    isDisabled: false,
+    createdAt: new Date(),
+  };
+  await setDoc(doc(this.firebase.db, 'users', uid), profile);
 
-    const favorites: Favorites = {
-      uid: uid,
-      filmIds: [],
-    };
+  const favorites: Favorites = {
+    uid: uid,
+    filmIds: [],
+  };
+  await setDoc(doc(this.firebase.db, 'favorites', uid), favorites);
 
-    await setDoc(doc(this.firebase.db, 'favorites', uid), favorites);
-    return credential.user;
-  }
+  return credential.user;
+}
+
+
 
   async login(email: string, password: string): Promise<UserProfile> {
     const credential = await signInWithEmailAndPassword(

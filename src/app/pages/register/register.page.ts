@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import {
   IonAvatar,
   IonButton,
@@ -16,12 +17,12 @@ import {
   NavController,
   ToastController,
 } from '@ionic/angular';
-import { RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth';
-import { FirebaseError } from 'firebase/app';
 import { Camera } from '@capacitor/camera';
+import { FirebaseError } from 'firebase/app';
 import { addIcons } from 'ionicons';
 import { camera } from 'ionicons/icons';
+import { AuthService } from '../../services/auth';
+
 @Component({
   selector: 'app-register',
   templateUrl: './register.page.html',
@@ -30,39 +31,38 @@ import { camera } from 'ionicons/icons';
     IonContent,
     IonHeader,
     IonTitle,
-    IonButton,
     IonToolbar,
-    CommonModule,
-    FormsModule,
-    RouterLink,
-    IonRouterLink,
+    IonButton,
     IonInput,
     IonItem,
     IonList,
     IonIcon,
-    IonAvatar
+    IonAvatar,
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    IonRouterLink,
   ],
 })
-
 export class RegisterPage {
-
-  constructor() {
-  addIcons({ camera });
-}
   email: string = '';
   password: string = '';
   nom: string = '';
   prenom: string = '';
   age: number | null = null;
-  photo: string | null = null;
+  photo = signal<string | null>(null);
 
   private authService = inject(AuthService);
   private navCtrl = inject(NavController);
   private toastController = inject(ToastController);
 
+  constructor() {
+    addIcons({ camera });
+  }
+
   private async showError(message: string) {
     const toast = await this.toastController.create({
-      message: message,
+      message,
       duration: 3000,
       color: 'danger',
       position: 'bottom',
@@ -70,9 +70,65 @@ export class RegisterPage {
     await toast.present();
   }
 
+  async takePhoto() {
+    try {
+      const result = await Camera.takePhoto({
+        quality: 50,
+        targetWidth: 300,
+        targetHeight: 300,
+        includeMetadata: true,
+      });
+
+      const format = result.metadata?.format ?? 'jpeg';
+      const dataUrl = `data:image/${format};base64,${result.thumbnail}`;
+
+      this.photo.set(await this.resizeImage(dataUrl, 300));
+    } catch (error) {
+      console.error('Photo annulée ou erreur :', error);
+    }
+  }
+
+  private async resizeImage(dataUrl: string, maxWidth: number): Promise<string> {
+    // 1. charger l'image
+    const image = new Image();
+    image.src = dataUrl;
+    await image.decode();
+
+    // 2. calculer les nouvelles dimensions
+    let width = image.width;
+    let height = image.height;
+
+    if (width > maxWidth) {
+      height = Math.round((height * maxWidth) / width);
+      width = maxWidth;
+    }
+
+    // 3. créer le canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+
+    // 4. dessiner l'image
+    const context = canvas.getContext('2d');
+    if (context === null) {
+      throw new Error('Impossible de créer le contexte 2D');
+    }
+    context.drawImage(image, 0, 0, width, height);
+
+    // 5. exporter l'image
+    return canvas.toDataURL('image/jpeg', 0.7);
+  }
+
   async onRegister() {
+    const photo = this.photo();
+
     if (this.age === null) {
-      await this.showError('Veuillez saisir votre âge');
+      await this.showError('Veuillez saisir votre âge.');
+      return;
+    }
+
+    if (photo === null) {
+      await this.showError('Veuillez prendre une photo de profil.');
       return;
     }
 
@@ -83,8 +139,8 @@ export class RegisterPage {
         this.nom,
         this.prenom,
         this.age,
+        photo,
       );
-
       await this.navCtrl.navigateRoot('/tabs/films');
     } catch (error: unknown) {
       console.error('Erreur lors de l’inscription :', error);
@@ -96,83 +152,16 @@ export class RegisterPage {
           case 'auth/email-already-in-use':
             message = 'Cette adresse e-mail est déjà utilisée.';
             break;
-
           case 'auth/invalid-email':
             message = 'Veuillez saisir une adresse e-mail valide.';
             break;
-
           case 'auth/weak-password':
             message = 'Le mot de passe doit contenir au moins 6 caractères.';
             break;
         }
       }
+
       await this.showError(message);
     }
   }
-
-  
-
-async takePhoto() {
-  try {
-    const result = await Camera.takePhoto({
-      quality: 50,
-      targetWidth: 300,
-      targetHeight: 300,
-      includeMetadata: true,
-    });
-
-    const format = result.metadata?.format ?? 'jpeg';
-    const dataUrl = `data:image/${format};base64,${result.thumbnail}`;
-
-    this.photo = await this.resizeImage(dataUrl, 300);
-
-    console.log(
-      'Taille approximative de la photo :',
-      (this.photo.length / 1024).toFixed(2),
-      'Ko'
-    );
-  } catch (error) {
-    console.error('Erreur lors du traitement de la photo :', error);
-  }
-}
-
-
-
-private async resizeImage(
-  dataUrl: string,
-  maxWidth: number
-): Promise<string> {
-  //  charger l'image
-  const image = new Image();
-  image.src = dataUrl;
-  await image.decode();
-
-  //  calculer les nouvelles dimensions
-  let width = image.width;
-  let height = image.height;
-
-  if (width > maxWidth) {
-    height = height * maxWidth / width;
-    width = maxWidth;
-  }
-
-  // créer le canvas
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-
-  //  dessiner l'image
-  const context = canvas.getContext('2d');
-
-  if (context === null) {
-    throw new Error('Impossible de créer le contexte 2D');
-  }
-
-  context.drawImage(image, 0, 0, width, height);
-
-  //  exporter l'image
-  return canvas.toDataURL('image/jpeg', 0.7);
-}
-
-
 }
