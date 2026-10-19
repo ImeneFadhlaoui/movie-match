@@ -1,19 +1,34 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular';
+import { Component, inject, signal } from '@angular/core';
+import { PercentPipe } from '@angular/common';
+import {
+  IonAvatar, IonContent, IonHeader, IonItem, IonLabel, IonList,
+  IonNote, IonSpinner, IonTitle, IonToolbar,
+} from '@ionic/angular';
+import { Match, MatchingService } from '../../services/matching';
 
 @Component({
   selector: 'app-matching',
   templateUrl: './matching.page.html',
   styleUrls: ['./matching.page.scss'],
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [
+    PercentPipe, IonContent, IonHeader, IonTitle, IonToolbar, IonList,
+    IonItem, IonLabel, IonAvatar, IonNote, IonSpinner,
+  ],
 })
-export class MatchingPage implements OnInit {
+export class MatchingPage {
+  private matchingService = inject(MatchingService);
 
-  constructor() { }
+  matches = signal<Match[]>([]);
+  loading = signal(true);
 
-  ngOnInit() {
+  async ionViewWillEnter() {
+    this.loading.set(true);
+    try {
+      this.matches.set(await this.matchingService.getMatches());
+    } catch (error) {
+      console.error('Erreur matching :', error);
+    } finally {
+      this.loading.set(false);
+    }
   }
-
 }

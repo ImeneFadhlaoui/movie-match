@@ -1,13 +1,36 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>matching</ion-title>
+    <ion-title>Matching</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">matching</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  @if (loading()) {
+    <div class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+    </div>
+  } @else {
+    <ion-list>
+      @for (match of matches(); track match.profile.uid) {
+        <ion-item>
+          <ion-avatar slot="start">
+            @if (match.profile.photoURL) {
+              <img [src]="match.profile.photoURL" alt="Photo" />
+            }
+          </ion-avatar>
+          <ion-label>
+            <h2>{{ match.profile.prenom }} {{ match.profile.nom }}</h2>
+            <p>{{ match.profile.age }} ans</p>
+          </ion-label>
+          <ion-note slot="end" color="success">
+            {{ match.score | percent }}
+          </ion-note>
+        </ion-item>
+      } @empty {
+        <p class="ion-padding">
+          Aucun utilisateur n'a plus de 75 % de films en commun avec toi pour le moment.
+        </p>
+      }
+    </ion-list>
+  }
 </ion-content>
