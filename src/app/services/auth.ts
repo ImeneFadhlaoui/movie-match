@@ -52,23 +52,18 @@ export class AuthService {
   }
 
   async login(email: string, password: string): Promise<UserProfile> {
-    const credential = signInWithEmailAndPassword(
+    const credential = await signInWithEmailAndPassword(
       this.firebase.auth,
       email,
       password,
     );
 
-    const uid = (await credential).user.uid;
+    const profile = await this.getProfile(credential.user.uid);
 
-    const profileRef = doc(this.firebase.db, 'users', uid);
-    const profileSnap = await getDoc(profileRef);
-
-    if (!profileSnap.exists()) {
+    if (profile === null) {
       await signOut(this.firebase.auth);
       throw new Error('PROFILE_NOT_FOUND');
     }
-
-    const profile = profileSnap.data() as UserProfile;
 
     if (profile.isDisabled === true) {
       await signOut(this.firebase.auth);
@@ -78,7 +73,18 @@ export class AuthService {
     return profile;
   }
 
-  async logout() : Promise<void> {
+  async logout(): Promise<void> {
     await signOut(this.firebase.auth);
+  }
+
+  async getProfile(uid: string): Promise<UserProfile | null> {
+    const profileRef = doc(this.firebase.db, 'users', uid);
+    const profileSnap = await getDoc(profileRef);
+
+    if (!profileSnap.exists()) {
+      return null;
+    }
+
+    return profileSnap.data() as UserProfile;
   }
 }
