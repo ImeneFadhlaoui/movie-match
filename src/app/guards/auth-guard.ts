@@ -13,14 +13,16 @@ export const authGuard: CanActivateFn = async () => {
   const user = firebaseService.auth.currentUser;
 
   if (!user) {
-    return router.createUrlTree(['/login']);
+    router.navigate(['/login']);
+    return false;
   }
 
   const profile = await authService.getProfile(user.uid);
 
   if (profile === null || profile.isDisabled === true) {
     await authService.logout();
-    return router.createUrlTree(['/login']);
+    router.navigate(['/login']);
+    return false;
   }
 
   return true;

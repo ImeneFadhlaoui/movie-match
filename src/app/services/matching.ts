@@ -7,8 +7,8 @@ import { UserProfile } from '../models/user-profile';
 
 export interface Match {
   profile: UserProfile;
-  score: number;        // entre 0 et 1
-  commonCount: number;  // nombre de films en commun
+  score: number;        
+  commonCount: number; 
 }
 
 const MATCH_THRESHOLD = 0.75;
@@ -20,7 +20,6 @@ export class MatchingService {
   private firebase = inject(FirebaseService);
   private authService = inject(AuthService);
 
-  // Indice de Jaccard : films en commun / films différents au total
   compare(listA: string[], listB: string[]): { score: number; common: number } {
     const setA = new Set(listA);
     const setB = new Set(listB);
@@ -43,7 +42,6 @@ export class MatchingService {
       throw new Error('NOT_AUTHENTICATED');
     }
 
-    // 1. Une seule lecture : toutes les playlists (y compris la mienne)
     const snapshot = await getDocs(collection(this.firebase.db, 'favorites'));
 
     const myDocument = snapshot.docs.find((document) => document.id === user.uid);
@@ -55,7 +53,6 @@ export class MatchingService {
       return [];
     }
 
-    // 2. Calcul des scores, sans aucune requête
     const candidates: { uid: string; score: number; common: number }[] = [];
     for (const document of snapshot.docs) {
       if (document.id === user.uid) {
@@ -68,7 +65,6 @@ export class MatchingService {
       }
     }
 
-    // 3. Lecture des profils des candidats, en parallèle
     const profiles = await Promise.all(
       candidates.map((candidate) => this.authService.getProfile(candidate.uid)),
     );
